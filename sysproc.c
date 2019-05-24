@@ -89,3 +89,8 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+void sys_invoked(int pid)
+{
+    invoked(pid);
+}
