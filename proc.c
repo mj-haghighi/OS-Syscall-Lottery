@@ -532,3 +532,10 @@ procdump(void)
     cprintf("\n");
   }
 }
+
+void
+invoked(int pid)
+{
+    cprintf("invoked process:")
+    // TODO implement printing process that system called
+}
