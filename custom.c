@@ -7,6 +7,6 @@
 int
 main(int argc, char* argv[])
 {
-    invoked((int)(argv[0]));
+    invoked();
     exit();
 }

@@ -90,7 +90,10 @@ sys_uptime(void)
   return xticks;
 }
 
-void sys_invoked(int pid)
+int
+sys_invoked(void)
 {
-    invoked(pid);
+    // TODO read pid from stack and pass to function
+    invoked();
+    return 22;
 }

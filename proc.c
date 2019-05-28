@@ -533,9 +533,10 @@ procdump(void)
   }
 }
 
-void
-invoked(int pid)
+int
+invoked(void)
 {
-    cprintf("invoked process:")
+    cprintf("invoked called");
+    return 22;
     // TODO implement printing process that system called
 }
