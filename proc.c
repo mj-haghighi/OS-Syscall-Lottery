@@ -534,9 +534,9 @@ procdump(void)
 }
 
 int
-invoked(void)
+invoked_syscalls(void)
 {
-    cprintf("invoked called");
+    cprintf("invoked_syscalls called\n");
     return 22;
     // TODO implement printing process that system called
 }

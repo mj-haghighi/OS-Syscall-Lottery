@@ -91,9 +91,9 @@ sys_uptime(void)
 }
 
 int
-sys_invoked(void)
+sys_invoked_syscalls(void)
 {
     // TODO read pid from stack and pass to function
-    invoked();
+    invoked_syscalls();
     return 22;
 }
