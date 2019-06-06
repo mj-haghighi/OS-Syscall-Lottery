@@ -42,9 +42,7 @@ struct system_call_histrory
 
 struct system_call
 {
-  int id;
   int count;
-  char name[10];
   struct system_call_histrory history[HISTORYMAX];
 };
 
