@@ -94,6 +94,9 @@ int
 sys_invoked_syscalls(void)
 {
     // TODO read pid from stack and pass to function
-    invoked_syscalls();
-    return 22;
+   int pid;
+   argint(0, &pid);
+    
+
+   return invoked_syscalls(pid);
 }
