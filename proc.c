@@ -111,11 +111,6 @@ found:
   p->context = (struct context*)sp;
   memset(p->context, 0, sizeof *p->context);
   p->context->eip = (uint)forkret;
-  
-  for (int i=0 ; i<SYSCALLMAX ; i++)
-  {
-     p->syscalls[i].count=0;
-  }
   return p;
 }
 
