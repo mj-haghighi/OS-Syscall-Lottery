@@ -11,6 +11,5 @@
 #define LOGSIZE      (MAXOPBLOCKS*3)  // max data blocks in on-disk log
 #define NBUF         (MAXOPBLOCKS*3)  // size of disk block cache
 #define FSSIZE       1000  // size of file system in blocks
-#define HISTORYMAX       20  // size of history
-#define SYSCALLMAX       22  // max number of syscalls in system
 
+#define RSCOUNTMAX       100 // max of record syscall_info
