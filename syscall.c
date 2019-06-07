@@ -134,39 +134,12 @@ static int (*syscalls[])(void) = {
 void
 syscall(void)
 {
-  int count=0;
   int num;
   struct proc *curproc = myproc();
 // put time here?
-  struct rtcdate r;
-
-  r.second = 0;
-  r.minute = 0;
-  r.hour = 0;
-  r.day = 0;
-  r.month = 0;
-  r.year = 0;
-
   num = curproc->tf->eax;
   if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
-    curproc->tf->eax = syscalls[num]();
-     
-    curproc->syscalls[num].count++;
-    count = curproc->syscalls[num].count;
-    count++;
-    if (curproc->syscalls[num].count < HISTORYMAX)
-    {
-      cmostime(&r);
-      curproc->syscalls[num].history[count].date = &r;
-    }else
-    {
-      for (int i=0 ; i+1<HISTORYMAX ; i++)
-      {
-        curproc->syscalls[num].history[i] = curproc->syscalls[num].history[i+1]; 
-      }
-      cmostime(&r);
-      curproc->syscalls[num].history[HISTORYMAX-1].date = &r;
-    }
+    curproc->tf->eax = syscalls[num]();     
   } else {
     cprintf("%d %s: unknown sys call %d\n",
             curproc->pid, curproc->name, num);
