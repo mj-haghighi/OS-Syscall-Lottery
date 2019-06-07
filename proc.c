@@ -22,12 +22,13 @@ struct {
 
 struct {
   struct spinlock lock;
-  int rscount; // recorded syscall max
-  int tscount; // total syscall max
   struct syscall_info sf[RSCOUNTMAX];
-} syscall_history;
+}  syscalls_history;
 
 static struct proc *initproc;
+
+int rscount = 0; // recorded syscall max
+int tscount = 0; // total syscall max
 
 int nextpid = 1;
 extern void forkret(void);
@@ -39,6 +40,7 @@ void
 pinit(void)
 {
   initlock(&ptable.lock, "ptable");
+  initlock(&syscalls_history.lock, "syscalls_history");
 }
 
 // Must be called with interrupts disabled
