@@ -32,21 +32,6 @@ struct context {
   uint eip;
 };
 
-struct system_call_histrory
-{
-  // args
-  struct rtcdate *date;
-};
-
-
-
-struct system_call
-{
-  int count;
-  struct system_call_histrory history[HISTORYMAX];
-};
-
-
 enum procstate { UNUSED, EMBRYO, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 
 // Per-process state
@@ -64,7 +49,6 @@ struct proc {
   struct file *ofile[NOFILE];  // Open files
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
-  struct system_call syscalls[SYSCALLMAX];
 };
 
 // Process memory is laid out contiguously, low addresses first:
