@@ -6,11 +6,26 @@
 #include "x86.h"
 #include "proc.h"
 #include "spinlock.h"
+#include "date.h"
+
+struct syscall_info{
+    char* name;
+    int id;
+    int pid;
+    struct rtcdate date;
+};
 
 struct {
   struct spinlock lock;
   struct proc proc[NPROC];
 } ptable;
+
+struct {
+  struct spinlock lock;
+  int rscount; // recorded syscall max
+  int tscount; // total syscall max
+  struct syscall_info sf[RSCOUNTMAX];
+} syscall_history;
 
 static struct proc *initproc;
 
