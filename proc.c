@@ -30,6 +30,39 @@ static struct proc *initproc;
 int rscount = 0; // recorded syscall max
 int tscount = 0; // total syscall max
 
+int get_rscount()
+{
+  return rscount;
+}
+
+void
+register_syscall(int pid, int id, char* name)
+{
+    struct rtcdate r;
+    cmostime(&r); 
+    
+    acquire(&syscalls_history.lock);
+
+    syscalls_history.sf[rscount].date = r;
+    syscalls_history.sf[rscount].pid = pid;
+    syscalls_history.sf[rscount].name = name;
+    syscalls_history.sf[rscount].id = id;
+    
+    rscount++;
+    tscount++;
+    if (rscount>=RSCOUNTMAX)
+    {
+      for (int i=0 ; i<RSCOUNTMAX-RSCOUNTMAX/2 ; i++)
+      {
+         syscalls_history.sf[i]=syscalls_history.sf[i+RSCOUNTMAX-RSCOUNTMAX/2];  
+      }
+      rscount=RSCOUNTMAX-RSCOUNTMAX/2 + 1 ;
+    }
+    release(&syscalls_history.lock);
+    return ;
+}
+
+
 int nextpid = 1;
 extern void forkret(void);
 extern void trapret(void);
