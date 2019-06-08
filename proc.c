@@ -30,10 +30,6 @@ static struct proc *initproc;
 int rscount = 0; // recorded syscall max
 int tscount = 0; // total syscall max
 
-int get_rscount()
-{
-  return rscount;
-}
 
 void
 register_syscall(int pid, int id, char* name)
@@ -586,6 +582,28 @@ int
 invoked_syscalls(int pid)
 {
     cprintf("invoked_syscalls called with %d \n", pid);
-    return 0;
+    if (ptable.proc[pid].state != UNUSED)
+    {
+      int count = 0;
+      for (int i = 0; i < rscount; i++)
+      {
+        if (pid == syscalls_history.sf[i].pid)
+        {
+          cprintf("name: %s , id: %d,  pid: %d, time: ", syscalls_history.sf[i].name, syscalls_history.sf[i].id, syscalls_history.sf[i].pid);
+          cprintf("%d", syscalls_history.sf[i].date.hour);
+          cprintf("%d", syscalls_history.sf[i].date.minute);
+          cprintf("%d", syscalls_history.sf[i].date.second);
+          cprintf("\n\n");
+          count++;
+        }
+      }
+      cprintf("Count= %d", count);
+    }
+    else
+    {
+      cprintf("procces dosent created!");
+    }
+    
+    return 22;
     // TODO implement printing process that system called
 }
