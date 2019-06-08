@@ -582,7 +582,7 @@ int
 invoked_syscalls(int pid)
 {
     cprintf("invoked_syscalls called with %d \n", pid);
-    if (ptable.proc[pid].state != UNUSED)
+    if (pid > 0 && pid < nextpid)
     {
       int count = 0;
       for (int i = 0; i < rscount; i++)

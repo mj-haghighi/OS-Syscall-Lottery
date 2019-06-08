@@ -97,6 +97,7 @@ sys_invoked_syscalls(void)
    int pid;
    argint(0, &pid);
     
+   invoked_syscalls(pid);
+   return 22; 
 
-   return invoked_syscalls(pid);
 }
