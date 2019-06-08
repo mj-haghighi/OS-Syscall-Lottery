@@ -580,8 +580,15 @@ procdump(void)
 
 int log_syscalls ()
 {
-  cprintf("log_syscalls called with  \n");
-
+  cprintf("log_syscalls called \n");
+  for (int i = 0; i < rscount; i++)
+  {
+    cprintf("name: %s , id: %d,  pid: %d, time: ", syscalls_history.sf[i].name, syscalls_history.sf[i].id, syscalls_history.sf[i].pid);
+    cprintf("%d:", syscalls_history.sf[i].date.hour);
+    cprintf("%d:", syscalls_history.sf[i].date.minute);
+    cprintf("%d", syscalls_history.sf[i].date.second);
+    cprintf("\n\n");
+  }
   return 23;
 }
 
@@ -597,8 +604,8 @@ invoked_syscalls(int pid)
         if (pid == syscalls_history.sf[i].pid)
         {
           cprintf("name: %s , id: %d,  pid: %d, time: ", syscalls_history.sf[i].name, syscalls_history.sf[i].id, syscalls_history.sf[i].pid);
-          cprintf("%d", syscalls_history.sf[i].date.hour);
-          cprintf("%d", syscalls_history.sf[i].date.minute);
+          cprintf("%d:", syscalls_history.sf[i].date.hour);
+          cprintf("%d:", syscalls_history.sf[i].date.minute);
           cprintf("%d", syscalls_history.sf[i].date.second);
           cprintf("\n\n");
           count++;
