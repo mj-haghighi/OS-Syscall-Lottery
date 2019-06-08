@@ -124,6 +124,9 @@ int             invoked_syscalls(int);
 int             log_syscalls();
 void            register_syscall(int, int, char*);
 
+// get_syscall_name.c
+char*           getName(int);
+
 // swtch.S
 void            swtch(struct context**, struct context*);
 

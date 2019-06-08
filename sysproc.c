@@ -99,7 +99,6 @@ sys_invoked_syscalls(void)
     
    invoked_syscalls(pid);
    return 22; 
-
 }
 int
 sys_log_syscalls(void)

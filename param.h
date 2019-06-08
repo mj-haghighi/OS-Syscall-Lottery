@@ -13,3 +13,4 @@
 #define FSSIZE       1000  // size of file system in blocks
 
 #define RSCOUNTMAX       100 // max of record syscall_info
+#define MAXSYSCALL         23

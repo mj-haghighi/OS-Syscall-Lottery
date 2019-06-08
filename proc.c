@@ -7,6 +7,7 @@
 #include "proc.h"
 #include "spinlock.h"
 #include "date.h"
+#include "get_syscall_name.c"
 
 struct syscall_info{
     char* name;
@@ -14,6 +15,15 @@ struct syscall_info{
     int pid;
     struct rtcdate date;
 };
+
+// struct arg
+// {
+//   int int_params[3];
+//   int int_params_count;
+
+//   char* string_params[3];
+//   int string_params_count[] 
+// };
 
 struct {
   struct spinlock lock;
@@ -26,10 +36,16 @@ struct {
 }  syscalls_history;
 
 static struct proc *initproc;
+int rscount = 0; // recorded syscall count
+int tscount = 0; // total syscall count
 
-int rscount = 0; // recorded syscall max
-int tscount = 0; // total syscall max
-
+void init_syscalls_count(int *sys_count)
+{
+  for (int i=0 ; i<MAXSYSCALL ; i++)
+  {
+    sys_count[i]=0;
+  }
+}
 
 void
 register_syscall(int pid, int id, char* name)
@@ -38,12 +54,19 @@ register_syscall(int pid, int id, char* name)
     cmostime(&r); 
     
     acquire(&syscalls_history.lock);
-
+    
     syscalls_history.sf[rscount].date = r;
     syscalls_history.sf[rscount].pid = pid;
     syscalls_history.sf[rscount].name = name;
     syscalls_history.sf[rscount].id = id;
-    
+    for (int i=0 ; i<NPROC ; i++)
+    {
+      if(ptable.proc[i].pid == pid)
+      {
+        ptable.proc[i].syscall_count[id]++;
+        break;
+      }
+    }
     rscount++;
     tscount++;
     if (rscount>=RSCOUNTMAX)
@@ -134,6 +157,7 @@ allocproc(void)
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
+  init_syscalls_count(p->syscall_count);
 
   release(&ptable.lock);
 
@@ -598,7 +622,6 @@ invoked_syscalls(int pid)
     cprintf("invoked_syscalls called with %d \n", pid);
     if (pid > 0 && pid < nextpid)
     {
-      int count = 0;
       for (int i = 0; i < rscount; i++)
       {
         if (pid == syscalls_history.sf[i].pid)
@@ -608,10 +631,21 @@ invoked_syscalls(int pid)
           cprintf("%d:", syscalls_history.sf[i].date.minute);
           cprintf("%d", syscalls_history.sf[i].date.second);
           cprintf("\n\n");
-          count++;
         }
       }
-      cprintf("Count= %d\n", count);
+      for (int i = 0; i < NPROC; i++)
+      {
+        if (ptable.proc[i].pid == pid)
+        {
+          for (int id = 0; id < MAXSYSCALL; id++)
+          {
+            if (ptable.proc[i].syscall_count[id] > 0)
+            {
+              cprintf(" %s  %d\n", getName(id), ptable.proc[i].syscall_count[id]);
+            }
+          }
+        }
+      }
     }
     else
     {
