@@ -8,6 +8,7 @@
 #include "syscall.h"
 #include "date.h"
 
+char* getName(int num);
 // User code makes a system call with INT T_SYSCALL.
 // System call number in %eax.
 // Arguments on the stack, from the user call to the C
@@ -139,10 +140,89 @@ syscall(void)
 // put time here?
   num = curproc->tf->eax;
   if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
-    curproc->tf->eax = syscalls[num]();     
+    curproc->tf->eax = syscalls[num]();
+    register_syscall(curproc->pid, num, getName(num));
   } else {
     cprintf("%d %s: unknown sys call %d\n",
             curproc->pid, curproc->name, num);
     curproc->tf->eax = -1;
   }
+}
+
+
+char* getName(int num)
+{
+  switch (num) {
+      case SYS_fork:
+        return("fork");
+        break;
+      case SYS_exit:
+        return("exit");
+        break;
+      case SYS_wait:
+        return("wait");
+        break;
+      case SYS_pipe:
+        return("pipe");
+        break;
+      case SYS_read:
+        return("read");
+        break;
+      case SYS_kill:
+        return("kill");
+        break;
+      case SYS_exec:
+        return("exec");
+        break;
+      case SYS_fstat:
+        return("fstat");
+        break;
+      case SYS_chdir:
+        return("chdir");
+        break;
+      case SYS_dup:
+        return("dup");
+        break;
+      case SYS_getpid:
+        return("getpid");
+        break;
+      case SYS_sbrk:
+        return("sbrk");
+        break;
+      case SYS_sleep:
+        return("sleep");
+        break;
+      case SYS_uptime:
+        return("uptime");
+        break;
+      case SYS_open:
+        return("open");
+        break;
+      case SYS_write:
+        return("write");
+        break;
+      case SYS_mknod:
+        return("mknod");
+        break;
+      case SYS_unlink:
+        return("unlink");
+        break;
+      case SYS_link:
+        return("link");
+        break;
+      case SYS_mkdir:
+        return("mkdir");
+        break;
+      case SYS_close:
+        return("close");
+        break;
+      case SYS_invoked_syscalls:
+        return("invoked_syscalls");
+        break;
+      default:
+      {
+        panic("should never get here\n");
+        return "";
+      }
+    }
 }
