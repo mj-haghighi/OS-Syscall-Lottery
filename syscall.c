@@ -106,6 +106,7 @@ extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
 extern int sys_invoked_syscalls(void);
+extern int sys_log_syscalls(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -130,6 +131,7 @@ static int (*syscalls[])(void) = {
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
 [SYS_invoked_syscalls]   sys_invoked_syscalls,
+[SYS_log_syscalls]   sys_log_syscalls,
 };
 
 void
@@ -218,6 +220,9 @@ char* getName(int num)
         break;
       case SYS_invoked_syscalls:
         return("invoked_syscalls");
+        break;
+      case SYS_log_syscalls:
+        return("log_syscalls");
         break;
       default:
       {

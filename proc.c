@@ -578,6 +578,13 @@ procdump(void)
   }
 }
 
+int log_syscalls ()
+{
+  cprintf("log_syscalls called with  \n");
+
+  return 23;
+}
+
 int
 invoked_syscalls(int pid)
 {

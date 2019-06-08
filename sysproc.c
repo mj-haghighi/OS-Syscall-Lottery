@@ -101,3 +101,12 @@ sys_invoked_syscalls(void)
    return 22; 
 
 }
+int
+sys_log_syscalls(void)
+{
+    // TODO read pid from stack and pass to function
+   
+   log_syscalls();
+   return 23; 
+
+}
