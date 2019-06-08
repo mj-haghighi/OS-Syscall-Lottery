@@ -611,7 +611,7 @@ invoked_syscalls(int pid)
           count++;
         }
       }
-      cprintf("Count= %d", count);
+      cprintf("Count= %d\n", count);
     }
     else
     {
