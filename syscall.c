@@ -9,139 +9,6 @@
 #include "date.h"
 
 char* getName(int num);
-void itoa(char* string, int num);
-void getArgs(char* args[10],int *args_count,int num)
-{
-  int temp_int;
-  // char temp_string[10];
-  switch (num) {
-      case SYS_fork:
-        return;
-        break;
-      case SYS_exit:
-        return;
-        break;
-      case SYS_wait:
-        return;
-        break;
-      case SYS_pipe:
-      {
-        args[*args_count] = "int *";
-        (*args_count)+=2;
-        return;
-      }
-        break;
-      case SYS_read:
-      {
-        args[*args_count] = "fd";
-        (*args_count)+=1;
-        args[*args_count] = "Inode";
-        (*args_count)+=1;
-        
-        args[*args_count] = "int";
-        (*args_count)+=1;
-        argint(2, &temp_int);
-        itoa(args[*args_count], temp_int);
-        (*args_count)+=1;
-        
-
-        args[*args_count] = "ptr";
-        (*args_count)+=1;
-        char* p;
-        argptr(1, &p, temp_int);
-        args[*args_count] = p;
-        return;
-      }
-
-        break;
-      case SYS_kill:
-      {
-        args[*args_count]="int";
-        (*args_count)+=2;
-        return;
-      }
-        break;
-      case SYS_exec:
-      {
-        args[*args_count]="char*";
-        (*args_count)+=2;
-        args[*args_count]="char**";
-        (*args_count)+=2;
-        return;
-      }
-        break;
-      case SYS_fstat:
-        return;
-        break;
-      case SYS_chdir:
-        return;
-        break;
-      case SYS_dup:
-        return;
-        break;
-      case SYS_getpid:
-        return;
-        break;
-      case SYS_sbrk:
-        return;
-        break;
-      case SYS_sleep:
-        return;
-        break;
-      case SYS_uptime:
-        return;
-        break;
-      case SYS_open:
-      {
-        args[*args_count] = "char*";
-        (*args_count)+=2;
-        args[*args_count] = "int";
-        (*args_count)+=2;
-        return;
-      }
-        break;
-      case SYS_write:
-      {
-        args[*args_count] = "int";
-        (*args_count)+=2;
-        args[*args_count] = "void*";
-        (*args_count)+=2;
-        args[*args_count] = "int";
-        (*args_count)+=2;
-      }
-        break;
-      case SYS_mknod:
-        return;
-        break;
-      case SYS_unlink:
-        return;
-        break;
-      case SYS_link:
-        return;
-        break;
-      case SYS_mkdir:
-        return;
-        break;
-      case SYS_close:
-      {
-        args[*args_count]="int";
-        (*args_count)+=2;
-        return;
-      }
-        break;
-      case SYS_invoked_syscalls:
-        return;
-        break;
-      case SYS_log_syscalls:
-        return;
-        break;
-      default:
-      {
-        panic("should never get here\n");
-        return;
-      }
-    }
-}
 // User code makes a system call with INT T_SYSCALL.
 // System call number in %eax.
 // Arguments on the stack, from the user call to the C
@@ -202,27 +69,6 @@ argptr(int n, char **pp, int size)
     return -1;
   *pp = (char*)i;
   return 0;
-}
-
-void 
-itoa(char* string, int num)
-{
-  int index=0;
-  char temp;
-  while (num>0)
-  {
-    string[index] = num%10 + '0';
-    num/=10;
-    index++;
-  }
-  string[index]='\0';
-  for(int i=0 ; i<index/2 ; i++)
-  {
-    temp = string[i];
-    string[i] = string[index - i - 1];
-    string[index - i -1] = temp;
-  }
-  return;
 }
 
 
@@ -296,17 +142,13 @@ syscall(void)
   struct proc *curproc = myproc();
 // put time here?
   num = curproc->tf->eax;
-  if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
+  if (num > 0 && num < NELEM(syscalls) && syscalls[num])
+  {
     curproc->tf->eax = syscalls[num]();
-    
-    char* args[10];
-    int arg_c=0;
-    // if (num==SYS_read)
-    // {
-      getArgs(args, &arg_c, num);
-      register_syscall(curproc->pid, num, getName(num), args, &arg_c);
-    // }
-  } else {
+    register_syscall(curproc->pid, num, getName(num));
+  }
+  else
+  {
     cprintf("%d %s: unknown sys call %d\n",
             curproc->pid, curproc->name, num);
     curproc->tf->eax = -1;

@@ -14,7 +14,7 @@ struct syscall_info{
     int id;
     int pid;
     struct rtcdate date;
-    char ** args;
+    char args [10][10];
     int args_c;
 };
 
@@ -32,6 +32,26 @@ static struct proc *initproc;
 int rscount = 0; // recorded syscall count
 int tscount = 0; // total syscall count
 
+void set_last_syscall_info(char* in)
+{
+  acquire(& syscalls_history.lock);
+  for (int i=0 ; i<10 && in[i] != '\0' ; i++)
+  {
+    syscalls_history.sf[rscount].args[syscalls_history.sf[rscount].args_c][i] = in[i];
+  }
+
+  syscalls_history.sf[rscount].args_c++;
+  release(& syscalls_history.lock);
+}
+
+void init_arg_count()
+{
+  for (int i=0 ; i<RSCOUNTMAX ; i++)
+  {
+    syscalls_history.sf[i].args_c=0;
+  }
+}
+
 void init_syscalls_count(int *sys_count)
 {
   for (int i=0 ; i<MAXSYSCALL ; i++)
@@ -41,7 +61,7 @@ void init_syscalls_count(int *sys_count)
 }
 
 void
-register_syscall(int pid, int id, char* name, char* args[10], int* args_c)
+register_syscall(int pid, int id, char* name)
 {
     struct rtcdate r;
     cmostime(&r); 
@@ -52,9 +72,7 @@ register_syscall(int pid, int id, char* name, char* args[10], int* args_c)
     syscalls_history.sf[rscount].pid = pid;
     syscalls_history.sf[rscount].name = name;
     syscalls_history.sf[rscount].id = id;
-    syscalls_history.sf[rscount].args = args;
-    syscalls_history.sf[rscount].args_c = *args_c;
-    
+
     for (int i=0 ; i<NPROC ; i++)
     {
       if(ptable.proc[i].pid == pid)
@@ -71,7 +89,11 @@ register_syscall(int pid, int id, char* name, char* args[10], int* args_c)
       {
          syscalls_history.sf[i]=syscalls_history.sf[i+RSCOUNTMAX-RSCOUNTMAX/2];  
       }
-      rscount=RSCOUNTMAX-RSCOUNTMAX/2 + 1 ;
+      rscount=RSCOUNTMAX-RSCOUNTMAX/2 + 1;
+      for (int i=rscount+1 ; i<RSCOUNTMAX ; i++)
+      {
+        syscalls_history.sf[i].args_c=0;
+      }
     }
     release(&syscalls_history.lock);
     return ;
@@ -89,6 +111,7 @@ pinit(void)
 {
   initlock(&ptable.lock, "ptable");
   initlock(&syscalls_history.lock, "syscalls_history");
+  init_arg_count();
 }
 
 // Must be called with interrupts disabled
@@ -627,12 +650,14 @@ invoked_syscalls(int pid)
       {
         if (pid == syscalls_history.sf[i].pid)
         {
-          cprintf("name: %s , id: %d,  pid: %d, time: ", syscalls_history.sf[i].name, syscalls_history.sf[i].id, syscalls_history.sf[i].pid);
+          cprintf("name: %s , id: %d,  pid: %d,", syscalls_history.sf[i].name, syscalls_history.sf[i].id, syscalls_history.sf[i].pid);
           for (int j=0; j<syscalls_history.sf[i].args_c ; j++)
           {
             cprintf("  %s  ", syscalls_history.sf[i].args[j]);
           }
+
           cprintf("\n");
+          cprintf("time: ");
           cprintf("%d:", syscalls_history.sf[i].date.hour);
           cprintf("%d:", syscalls_history.sf[i].date.minute);
           cprintf("%d", syscalls_history.sf[i].date.second);

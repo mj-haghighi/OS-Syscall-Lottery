@@ -15,7 +15,8 @@
 #include "sleeplock.h"
 #include "file.h"
 #include "fcntl.h"
-
+char temp[10]="123456789";
+// int ra = 55;
 // Fetch the nth word-sized system call argument as a file descriptor
 // and return both the descriptor and the corresponding struct file.
 static int
@@ -66,15 +67,46 @@ sys_dup(void)
   return fd;
 }
 
+void 
+itoa(char* string, int num)
+{
+  int index=0;
+  // char temp;
+  while (num>0)
+  {
+    string[index] = num%10 + '0';
+    num/=10;
+    index++;
+  }
+  string[index]='\0';
+  // for(int i=0 ; i<index/2 ; i++)
+  // {
+  //   temp = string[i];
+  //   string[i] = string[index - i - 1];
+  //   string[index - i -1] = temp;
+  // }
+  return;
+}
+
 int
 sys_read(void)
 {
   struct file *f;
   int n;
   char *p;
-
-  if(argfd(0, 0, &f) < 0 || argint(2, &n) < 0 || argptr(1, &p, n) < 0)
+  
+  if (argfd(0, 0, &f) < 0 || argint(2, &n) < 0 || argptr(1, &p, n) < 0)
     return -1;
+  
+  set_last_syscall_info("fd: ");
+  set_last_syscall_info("Inode");
+  set_last_syscall_info("ptr: ");
+  set_last_syscall_info((char*)p);
+  set_last_syscall_info("int");
+  itoa(temp, n);
+  // ra++;
+  set_last_syscall_info(temp);
+
   return fileread(f, p, n);
 }
 
