@@ -14,16 +14,9 @@ struct syscall_info{
     int id;
     int pid;
     struct rtcdate date;
+    char ** args;
+    int args_c;
 };
-
-// struct arg
-// {
-//   int int_params[3];
-//   int int_params_count;
-
-//   char* string_params[3];
-//   int string_params_count[] 
-// };
 
 struct {
   struct spinlock lock;
@@ -48,7 +41,7 @@ void init_syscalls_count(int *sys_count)
 }
 
 void
-register_syscall(int pid, int id, char* name)
+register_syscall(int pid, int id, char* name, char* args[10], int* args_c)
 {
     struct rtcdate r;
     cmostime(&r); 
@@ -59,6 +52,9 @@ register_syscall(int pid, int id, char* name)
     syscalls_history.sf[rscount].pid = pid;
     syscalls_history.sf[rscount].name = name;
     syscalls_history.sf[rscount].id = id;
+    syscalls_history.sf[rscount].args = args;
+    syscalls_history.sf[rscount].args_c = *args_c;
+    
     for (int i=0 ; i<NPROC ; i++)
     {
       if(ptable.proc[i].pid == pid)
@@ -608,6 +604,11 @@ int log_syscalls ()
   for (int i = 0; i < rscount; i++)
   {
     cprintf("name: %s , id: %d,  pid: %d, time: ", syscalls_history.sf[i].name, syscalls_history.sf[i].id, syscalls_history.sf[i].pid);
+    for (int j = 0; j < syscalls_history.sf[i].args_c; j++)
+    {
+      cprintf("  %s  ", syscalls_history.sf[i].args[j]);
+    }
+    cprintf("\n");
     cprintf("%d:", syscalls_history.sf[i].date.hour);
     cprintf("%d:", syscalls_history.sf[i].date.minute);
     cprintf("%d", syscalls_history.sf[i].date.second);
@@ -627,6 +628,11 @@ invoked_syscalls(int pid)
         if (pid == syscalls_history.sf[i].pid)
         {
           cprintf("name: %s , id: %d,  pid: %d, time: ", syscalls_history.sf[i].name, syscalls_history.sf[i].id, syscalls_history.sf[i].pid);
+          for (int j=0; j<syscalls_history.sf[i].args_c ; j++)
+          {
+            cprintf("  %s  ", syscalls_history.sf[i].args[j]);
+          }
+          cprintf("\n");
           cprintf("%d:", syscalls_history.sf[i].date.hour);
           cprintf("%d:", syscalls_history.sf[i].date.minute);
           cprintf("%d", syscalls_history.sf[i].date.second);

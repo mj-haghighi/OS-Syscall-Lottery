@@ -122,7 +122,7 @@ void            wakeup(void*);
 void            yield(void);
 int             invoked_syscalls(int);
 int             log_syscalls();
-void            register_syscall(int, int, char*);
+void            register_syscall(int, int, char*, char*[10], int*);
 
 // get_syscall_name.c
 char*           getName(int);
