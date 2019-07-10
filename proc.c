@@ -8,7 +8,7 @@
 #include "spinlock.h"
 #include "date.h"
 #include "get_syscall_name.c"
-#include "rand.h"
+#include "rand.c"
 
 struct syscall_info{
     char* name;
@@ -417,10 +417,15 @@ scheduler(void)
   c->proc = 0;
   int lottery_total_tickets = 0;
   int chance = 0;
+  int passed_tickets = 0;
+  
   for(;;){
     // Enable interrupts on this processor.
     sti();
 
+    chance = 0;
+    passed_tickets = 0;
+    lottery_total_tickets=0;
     for (p = ptable.proc; p<&ptable.proc[NPROC] ; p++)
     {
         if(p->state == RUNNABLE)
@@ -429,14 +434,19 @@ scheduler(void)
         }  
     }
     chance = random_at_most(lottery_total_tickets);
-    
+
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       if(p->state != RUNNABLE)
         continue;
-
-
+      
+      if (passed_tickets + p->ticket < chance)
+      {
+        passed_tickets += p->ticket;
+        continue;
+      }
+            
       // Switch to chosen process.  It is the process's job
       // to release ptable.lock and then reacquire it
       // before jumping back to us.
@@ -450,6 +460,9 @@ scheduler(void)
       // Process is done running for now.
       // It should have changed its p->state before coming back.
       c->proc = 0;
+      chance = 0;
+      passed_tickets = 0;
+      lottery_total_tickets = 0;
     }
     release(&ptable.lock);
 
