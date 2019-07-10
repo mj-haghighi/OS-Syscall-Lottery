@@ -413,11 +413,19 @@ scheduler(void)
   struct proc *p;
   struct cpu *c = mycpu();
   c->proc = 0;
-  
+  int lottery_total_tickets = 0;
+
   for(;;){
     // Enable interrupts on this processor.
     sti();
 
+    for (p = ptable.proc; p<&ptable.proc[NPROC] ; p++)
+    {
+        if(p->state == RUNNABLE)
+        {
+          lottery_total_tickets = p->ticket + lottery_total_tickets;
+        }  
+    }
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
