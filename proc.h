@@ -51,6 +51,9 @@ struct proc {
   char name[16];               // Process name (debugging)
   int syscall_count[MAXSYSCALL];
   int ticket;
+  uint response_time;
+  uint turn_around_time;
+  int   serv;  
 };
 
 // Process memory is laid out contiguously, low addresses first:

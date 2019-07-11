@@ -202,6 +202,12 @@ found:
   memset(p->context, 0, sizeof *p->context);
   p->context->eip = (uint)forkret;
   p->ticket = 10;
+  
+  acquire(&tickslock);
+  p->response_time = ticks;
+  p->turn_around_time = ticks;
+  p->serv=0;
+  release(&tickslock);
   return p;
 }
 
@@ -353,6 +359,11 @@ exit(void)
 
   // Jump into the scheduler, never to return.
   curproc->state = ZOMBIE;
+  acquire(&tickslock);
+  curproc->turn_around_time = ticks - curproc->turn_around_time;
+  release(&tickslock);
+
+  cprintf("pid = %d, turn_around_time=%d, response_time=%d\n", curproc->pid, curproc->turn_around_time, curproc->response_time);
   sched();
   panic("zombie exit");
 }
@@ -454,6 +465,14 @@ scheduler(void)
       switchuvm(p);
       p->state = RUNNING;
 
+      // acquire(&tickslock);
+      if(p->serv == 0)
+      {
+        p->response_time = ticks - p->response_time;
+        p->serv=1;
+      }
+      // release(&tickslock);
+
       swtch(&(c->scheduler), p->context);
       switchkvm();
 
@@ -464,6 +483,7 @@ scheduler(void)
       passed_tickets = 0;
       lottery_total_tickets = 0;
     }
+    
     release(&ptable.lock);
 
   }
